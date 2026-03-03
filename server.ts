@@ -11,16 +11,16 @@ async function startServer() {
   // API Routes
   app.post('/api/transcribe', async (req, res) => {
     const { url } = req.body;
-    
+
     if (!url) {
       return res.status(400).json({ error: 'URL is required' });
     }
 
     console.log(`[Backend] Received real transcription request for: ${url}`);
-    
-    // Spawn the Python process
-    const pythonProcess = spawn('python', ['python_backend.py', '--url', url]);
-    
+
+    const pythonExecutable = process.platform === 'win32' ? '.venv\\\\Scripts\\\\python.exe' : '.venv/bin/python';
+    const pythonProcess = spawn(pythonExecutable, ['python_backend.py', '--url', url]);
+
     let stdoutData = '';
     let stderrData = '';
 
@@ -38,7 +38,7 @@ async function startServer() {
 
     pythonProcess.on('close', (code) => {
       console.log(`[Backend] Python process exited with code ${code}`);
-      
+
       if (code !== 0) {
         return res.status(500).json({ error: 'AI Processing failed', details: stderrData });
       }
