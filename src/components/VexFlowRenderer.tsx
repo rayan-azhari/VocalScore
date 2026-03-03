@@ -8,7 +8,7 @@ interface VexFlowRendererProps {
 }
 
 export function VexFlowRenderer({ notes, width = 500, height = 150 }: VexFlowRendererProps) {
-  const containerRef = useRef<htmldivelement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -18,17 +18,17 @@ export function VexFlowRenderer({ notes, width = 500, height = 150 }: VexFlowRen
 
     // Create an SVG renderer and attach it to the DIV element
     const renderer = new Renderer(containerRef.current, Renderer.Backends.SVG);
-    
+
     // Configure the rendering context
     renderer.resize(width, height);
     const context = renderer.getContext();
-    
+
     // Create a stave of width 400 at position 10, 40 on the canvas
     const stave = new Stave(10, 40, width - 20);
-    
+
     // Add a clef and time signature
     stave.addClef('treble').addTimeSignature('4/4');
-    
+
     // Connect it to the rendering context and draw
     stave.setContext(context).draw();
 
@@ -43,7 +43,7 @@ export function VexFlowRenderer({ notes, width = 500, height = 150 }: VexFlowRen
       });
 
       // Create a voice in 4/4 and add the notes
-      const voice = new Voice({ num_beats: 4, beat_value: 4 });
+      const voice = new Voice({ numBeats: 4, beatValue: 4 });
       voice.addTickables(vfNotes);
 
       // Format and justify the notes to 400 pixels
@@ -54,5 +54,5 @@ export function VexFlowRenderer({ notes, width = 500, height = 150 }: VexFlowRen
     }
   }, [notes, width, height]);
 
-  return <div ref="{containerRef}" classname="flex justify-center overflow-x-auto"/>;
+  return <div ref={containerRef} className="flex justify-center overflow-x-auto" />;
 }
