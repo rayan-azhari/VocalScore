@@ -4,11 +4,11 @@ VocalScore is a streamlined SaaS application designed to bridge the gap between 
 
 ## 🌟 Features
 
-* **Frictionless Input**: Simply paste a YouTube/Spotify link or upload an audio file.
-* **AI-Powered Source Separation**: Isolates the human voice from heavy background music using state-of-the-art models.
-* **Accurate Pitch Extraction**: Converts the isolated vocal stem into discrete MIDI notes, smoothing out vibrato and breath noise.
-* **In-Browser Sheet Music**: Renders the extracted notes onto a standard music staff (pentagram) using VexFlow.
-* **Credit-Based System**: Protects heavy GPU compute costs while offering a freemium tier for casual users.
+* **Frictionless Input**: Paste a YouTube/Spotify link or process a local vocal file directly.
+* **Professional Sheet Music**: Renders multi-system scores with system brackets, vocal labels, and songbook-style headers.
+* **AI-Powered Source Separation**: Isolates the human voice from heavy background music using Demucs.
+* **Lyrics Transcription**: Uses OpenAI Whisper to transcribe and align lyrics directly beneath the notes.
+* **Accurate Pitch Extraction**: Converts vocals into discrete MIDI notes using Basic-Pitch.
 
 ## 🛠️ Tech Stack
 
@@ -27,6 +27,7 @@ VocalScore is a streamlined SaaS application designed to bridge the gap between 
 * **yt-dlp**: Audio ingestion from URLs.
 * **Demucs (Meta)**: AI source separation (isolating vocals).
 * **Basic-Pitch (Spotify)**: Audio-to-MIDI pitch extraction.
+* **Whisper (OpenAI)**: Lyrics transcription and timestamp alignment.
 
 ## 🚀 Getting Started & Local Testing
 
@@ -45,7 +46,7 @@ To run the full AI pipeline on your local machine, you must have the following i
 
 Open your terminal and install the required machine learning and audio processing libraries:
 ```bash
-pip install yt-dlp basic-pitch librosa pretty_midi
+pip install yt-dlp basic-pitch librosa pretty_midi openai-whisper
 ```
 
 **Installing Demucs:**
@@ -73,7 +74,8 @@ pip install git+https://github.com/facebookresearch/demucs
 2. Click the **Transcribe** button.
 3. The Node.js backend will now automatically spawn the Python AI worker (`python_backend.py`).
 4. **Note:** Processing a real song takes a few minutes depending on your CPU/GPU. You will see the progress bar slowly moving through the 4 stages (Fetching, Isolating, Extracting, Rendering).
-5. Once the Python script finishes, the real extracted MIDI notes will be sent to the frontend and rendered beautifully on your screen using VexFlow!
+5. **Advanced Expert Mode**: If you already have a vocal stem file (e.g., `vocals.wav`), toggle "Show Advanced Options" in the UI and paste the absolute file path to process it directly, bypassing download and separation.
+6. Once the pipeline finishes, you'll see a professional score with **aligned lyrics** rendered in your browser!
 
 ## 📁 Project Structure
 
