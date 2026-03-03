@@ -10,16 +10,20 @@ async function startServer() {
 
   // API Routes
   app.post('/api/transcribe', async (req, res) => {
-    const { url } = req.body;
+    const { url, inputFile } = req.body;
 
-    if (!url) {
-      return res.status(400).json({ error: 'URL is required' });
+    if (!url && !inputFile) {
+      return res.status(400).json({ error: 'URL or inputFile is required' });
     }
 
-    console.log(`[Backend] Received real transcription request for: ${url}`);
+    console.log(`[Backend] Received transcription request. URL: ${url || 'N/A'}, File: ${inputFile || 'N/A'}`);
 
-    const pythonExecutable = process.platform === 'win32' ? '.venv\\\\Scripts\\\\python.exe' : '.venv/bin/python';
-    const pythonProcess = spawn(pythonExecutable, ['python_backend.py', '--url', url]);
+    const pythonExecutable = process.platform === 'win32' ? '.venv\\Scripts\\python.exe' : '.venv/bin/python';
+    const args = ['python_backend.py', '--skip-existing'];
+    if (url) args.push('--url', url);
+    if (inputFile) args.push('--input-file', inputFile);
+
+    const pythonProcess = spawn(pythonExecutable, args);
 
     let stdoutData = '';
     let stderrData = '';
@@ -43,16 +47,25 @@ async function startServer() {
         return res.status(500).json({ error: 'AI Processing failed', details: stderrData });
       }
 
-      // Extract JSON from stdout
-      const match = stdoutData.match(/===RESULT_JSON_BEGIN===\n([\s\S]*?)\n===RESULT_JSON_END===/);
+      console.log(`[Backend] Python process closed. Stdout length: ${stdoutData.length}`);
+
+      // Detailed debug of stdout
+      console.log(`[Backend] Full Stdout: \n${stdoutData}`);
+
+      // Extract JSON from stdout with permissive newline handling
+      const match = stdoutData.match(/===RESULT_JSON_BEGIN===\s*([\s\S]*?)\s*===RESULT_JSON_END===/);
       if (match && match[1]) {
         try {
-          const result = JSON.parse(match[1]);
+          const jsonStr = match[1].trim();
+          console.log(`[Backend] Extracted JSON string: ${jsonStr.substring(0, 100)}...`);
+          const result = JSON.parse(jsonStr);
           return res.json(result);
         } catch (e) {
+          console.error(`[Backend] Failed to parse JSON: ${e}`);
           return res.status(500).json({ error: 'Failed to parse Python output' });
         }
       } else {
+        console.error(`[Backend] No JSON result found in Python output. Regex match failed.`);
         return res.status(500).json({ error: 'No JSON result found in Python output' });
       }
     });
