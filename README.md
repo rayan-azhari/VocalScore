@@ -29,25 +29,35 @@ VocalScore is a streamlined SaaS application designed to bridge the gap between 
 * **Basic-Pitch (Spotify)**: Audio-to-MIDI pitch extraction.
 * **Whisper (OpenAI)**: Lyrics transcription and timestamp alignment.
 
-## 🚀 Getting Started & Local Testing
+## 🚀 Getting Started (Docker - Recommended)
+
+To eliminate environment issues and "requirements not found" bugs, we use Docker to run the AI worker in a consistent Linux environment.
 
 ### Prerequisites
 
-To run the full AI pipeline on your local machine, you must have the following installed:
-1. **Node.js** (v18+)
-2. **Python** (v3.10 or v3.11 strongly recommended)
-   * *Note: Python 3.12 and 3.13 are too new for many audio/ML libraries (like `lameenc`, `torch`, and `tensorflow`) and will cause installation errors.*
-3. **FFmpeg** (Required by yt-dlp and Demucs for audio processing)
-   * Mac: `brew install ffmpeg`
-   * Windows: Download from [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) or use `winget install ffmpeg`
-   * Linux: `sudo apt install ffmpeg`
+1. **Docker Desktop**: [Download here](https://www.docker.com/products/docker-desktop/)
+2. **Node.js** (v18+)
 
-### 1. Install Python AI Dependencies
-
-Open your terminal and install the required machine learning and audio processing libraries:
+### 1. Build the AI Worker Image
+Open your terminal in the project root and run:
 ```bash
-pip install yt-dlp basic-pitch librosa pretty_midi openai-whisper
+docker build -t vocalscore-worker .
 ```
+
+### 2. Run the Web Application
+1. Install Node.js dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+3. Open your browser to `http://localhost:5000`.
+
+---
+
+## 🚀 Legacy Setup (Manual .venv)
 
 **Installing Demucs:**
 If you encounter an error like `FileNotFoundError: ... requirements_minimal.txt` when trying to install `demucs` via pip (especially on Windows or newer Python versions), install it directly from their official GitHub repository instead:

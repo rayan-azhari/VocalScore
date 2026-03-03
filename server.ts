@@ -18,12 +18,25 @@ async function startServer() {
 
     console.log(`[Backend] Received transcription request. URL: ${url || 'N/A'}, File: ${inputFile || 'N/A'}`);
 
-    const pythonExecutable = process.platform === 'win32' ? '.venv\\Scripts\\python.exe' : '.venv/bin/python';
-    const args = ['python_backend.py', '--skip-existing'];
-    if (url) args.push('--url', url);
-    if (inputFile) args.push('--input-file', inputFile);
+    // Use Docker to run the AI worker (vocalscore-worker)
+    // This avoids all local Python environment issues.
+    const containerArgs = [
+      'run', '--rm',
+      '-v', `${process.cwd()}:/app`,
+      'vocalscore-worker',
+      '--skip-existing'
+    ];
 
-    const pythonProcess = spawn(pythonExecutable, args);
+    if (url) containerArgs.push('--url', url);
+    if (inputFile) {
+      // Map absolute Windows path to container /app path if it's within project
+      const relativePath = inputFile.replace(process.cwd(), '').replace(/\\/g, '/');
+      const containerPath = `/app${relativePath.startsWith('/') ? '' : '/'}${relativePath}`;
+      containerArgs.push('--input-file', containerPath);
+    }
+
+    console.log(`[Backend] Spawning Docker: docker ${containerArgs.join(' ')}`);
+    const pythonProcess = spawn('docker', containerArgs);
 
     let stdoutData = '';
     let stderrData = '';
