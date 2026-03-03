@@ -1,0 +1,5 @@
+{
+  "name": "VocalScore",
+  "description": "Convert YouTube links or audio files into vocal sheet music instantly.",
+  "requestFramePermissions": []
+}
